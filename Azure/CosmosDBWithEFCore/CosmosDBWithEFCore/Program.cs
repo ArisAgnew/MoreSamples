@@ -10,11 +10,15 @@ namespace CosmosDBWithEFCore
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static Program()
+        {
+            Container = ConfigureServices();
+        }
+
+        static async Task Main()
         {
             try
             {
-                ConfigureServices();
                 var service = Container.GetRequiredService<BooksService>();
                 await service.CreateTheDatabaseAsync();
                 await service.WriteBooksAsync();
@@ -27,7 +31,7 @@ namespace CosmosDBWithEFCore
             }
         }
 
-        public static void ConfigureServices()
+        public static IServiceProvider ConfigureServices()
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -47,9 +51,9 @@ namespace CosmosDBWithEFCore
             services.AddLogging(options =>
                 options.AddDebug().SetMinimumLevel(LogLevel.Trace));
 
-            Container = services.BuildServiceProvider();
+            return services.BuildServiceProvider();
         }
 
-        public static ServiceProvider Container { get; private set; }
+        public static IServiceProvider Container { get;  }
     }
 }
